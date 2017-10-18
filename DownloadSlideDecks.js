@@ -1,5 +1,5 @@
-var fs = require("fs");
-var tweet = require("./tweet");
+var fs = require("fs-extra");
+//var tweet = require("./tweet");
 var oow2017Filename = 'oow2017-sessions-catalog.json';
 var javaone2017Filename = 'javaone2017-sessions-catalog.json';
 const download = require('download');
@@ -19,9 +19,9 @@ function delay(t) {
 function downloadSessionSlides() {
     var ctr = 0;
     sessions = [];
-    sessions = JSON.parse(fs.readFileSync(oow2017Filename).toString());
+    sessions = fs.readJsonSync(oow2017Filename);
     handleNewSessions(sessions);
-    sessions = JSON.parse(fs.readFileSync(javaone2017Filename).toString());
+    sessions = fs.readJsonSync(javaone2017Filename);
     handleNewSessions(sessions);
     setTimeout(downloadSessionSlides, 20 * 60 * 1000);
 }
@@ -48,7 +48,7 @@ function handleNewSessions(sessions) {
         }//if files
     }//for
     // - write file with session entries
-    fs.writeFile(sessionsDowloadedFileName, JSON.stringify(sessionsSlidesDownloaded, null, '\t'));
+    fs.outputFile(sessionsDowloadedFileName, JSON.stringify(sessionsSlidesDownloaded, null, '\t'));
 }
 
 function getDownloader(url, filename) {
@@ -56,7 +56,7 @@ function getDownloader(url, filename) {
     return function () {
         console.log("*** Download : " + url);
         download(url).then(data => {
-            fs.writeFileSync('slides/' + filename, data);
+            fs.outputFileSync('slides/' + filename, data);
             console.log('-----------++++++++++ Done Downloading '+filename)
         })
     }
@@ -64,5 +64,5 @@ function getDownloader(url, filename) {
 
 
 
-sessionsSlidesDownloaded = JSON.parse(fs.readFileSync(sessionsDowloadedFileName).toString());
+sessionsSlidesDownloaded = fs.readJsonSync(sessionsDowloadedFileName);
 downloadSessionSlides();
